@@ -15,35 +15,29 @@ interface RecommendationsSectionProps {
 
 const PRIORITY_STYLES: Record<
   IsoPriority,
-  { label: string; shortPlural: string; badgeClass: string; borderClass: string }
+  { label: string; badgeClass: string; borderClass: string }
 > = {
   critica: {
     label: 'Prioridad Crítica',
-    shortPlural: 'Crítica',
     badgeClass: 'bg-amber-100 text-amber-950 border border-amber-300',
     borderClass: 'border-l-amber-600',
   },
   alta: {
     label: 'Prioridad Alta',
-    shortPlural: 'Alta',
     badgeClass: 'bg-[#EBF4FF] text-[#003B7E] border border-[#BFD9FA]',
     borderClass: 'border-l-[#0056B4]',
   },
   media: {
     label: 'Prioridad Media',
-    shortPlural: 'Media',
     badgeClass: 'bg-sky-50 text-sky-900 border border-sky-200',
     borderClass: 'border-l-sky-600',
   },
   mantener: {
     label: 'Capitalizar (10.3)',
-    shortPlural: 'Capitalizar',
     badgeClass: 'bg-emerald-50 text-emerald-900 border border-emerald-200',
     borderClass: 'border-l-emerald-600',
   },
 };
-
-const PRIORITY_ORDER: IsoPriority[] = ['critica', 'alta', 'media', 'mantener'];
 
 export function RecommendationsSection({
   responses,
@@ -62,33 +56,6 @@ export function RecommendationsSection({
     [responses, metrics, presentationMode, anonMap],
   );
 
-  const priorityCounts = useMemo(() => {
-    const counts: Record<IsoPriority, number> = {
-      critica: 0,
-      alta: 0,
-      media: 0,
-      mantener: 0,
-    };
-    for (const rec of recommendations) {
-      counts[rec.priority] += 1;
-    }
-    return counts;
-  }, [recommendations]);
-
-  const summaryPills = PRIORITY_ORDER.map((priority) => {
-    const count = priorityCounts[priority];
-    if (count === 0) return null;
-    const style = PRIORITY_STYLES[priority];
-    return (
-      <span
-        key={priority}
-        className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold tabular-nums ${style.badgeClass}`}
-      >
-        {count} {style.shortPlural}
-      </span>
-    );
-  });
-
   return (
     <CollapsibleSection
       id="iso-recommendations-panel"
@@ -97,7 +64,6 @@ export function RecommendationsSection({
       title="Recomendaciones y Mejora Continua (ISO 9001:2015)"
       subtitle="Plan accionable derivado automáticamente de los resultados filtrados conforme a buenas prácticas del Sistema de Gestión de la Calidad."
       badge="Cláusulas 9.1.2 · 10.2 · 10.3"
-      summaryPills={summaryPills}
       itemCount={recommendations.length}
     >
       {recommendations.length === 0 ? (

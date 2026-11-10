@@ -104,21 +104,6 @@ export function PriorityAttentionSection({
     );
   }
 
-  const summaryPills = (
-    <>
-      {detractors.length > 0 && (
-        <span className="rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-950 tabular-nums">
-          {detractors.length} Detractores (0–6)
-        </span>
-      )}
-      {actionablePassives.length > 0 && (
-        <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-[11px] font-bold text-sky-900 tabular-nums">
-          {actionablePassives.length} Pasivos accionables (7–8)
-        </span>
-      )}
-    </>
-  );
-
   return (
     <CollapsibleSection
       id="priority-attention-panel"
@@ -126,7 +111,6 @@ export function PriorityAttentionSection({
       icon={<AlertTriangle className="h-5 w-5 shrink-0 text-amber-700" aria-hidden="true" />}
       title="Foco Prioritario: Retención y Conversión a Promotores"
       subtitle="Cuentas detractoras para seguimiento inmediato y pasivos con observaciones detalladas."
-      summaryPills={summaryPills}
       itemCount={detractors.length + actionablePassives.length}
     >
       <div className="space-y-5">

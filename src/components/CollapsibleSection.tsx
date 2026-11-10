@@ -10,7 +10,6 @@ interface CollapsibleSectionProps {
   title: string;
   subtitle: string;
   badge?: string;
-  summaryPills?: ReactNode;
   itemCount: number;
   defaultExpanded?: boolean;
   children: ReactNode;
@@ -23,7 +22,6 @@ export function CollapsibleSection({
   title,
   subtitle,
   badge,
-  summaryPills,
   itemCount,
   defaultExpanded = false,
   children,
@@ -40,9 +38,9 @@ export function CollapsibleSection({
         onClick={() => setIsExpanded((prev) => !prev)}
         aria-expanded={isExpanded}
         aria-controls={id}
-        className="flex w-full cursor-pointer flex-col gap-3 rounded-2xl p-5 text-left transition-colors hover:bg-slate-50/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B4] lg:flex-row lg:items-center lg:justify-between"
+        className="flex w-full cursor-pointer flex-col gap-3 rounded-2xl p-5 text-left transition-colors hover:bg-slate-50/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B4] sm:flex-row sm:items-center sm:justify-between"
       >
-        <div>
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             {icon}
             <h2 className="text-base font-extrabold text-[#0A2540]">{title}</h2>
@@ -55,22 +53,16 @@ export function CollapsibleSection({
           <p className="mt-1 text-xs text-slate-600">{subtitle}</p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {summaryPills && (
-            <div className="flex flex-wrap items-center gap-1.5">{summaryPills}</div>
-          )}
-
-          <span className="no-print inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-[#0056B4] tabular-nums">
-            <ClipboardCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <span>{isExpanded ? 'Ocultar' : `Desplegar (${itemCount})`}</span>
-            <ChevronDown
-              className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
-                isExpanded ? 'rotate-180' : ''
-              }`}
-              aria-hidden="true"
-            />
-          </span>
-        </div>
+        <span className="no-print inline-flex min-h-9 shrink-0 items-center gap-1.5 self-start rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-[#0056B4] tabular-nums sm:self-center">
+          <ClipboardCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>{isExpanded ? 'Ocultar' : `Desplegar (${itemCount})`}</span>
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
+              isExpanded ? 'rotate-180' : ''
+            }`}
+            aria-hidden="true"
+          />
+        </span>
       </button>
 
       <div

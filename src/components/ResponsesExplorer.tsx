@@ -7,7 +7,7 @@ import {
   SEGMENT_CONFIG,
   STRENGTH_THEME_MAP,
 } from '@/lib/ui-helpers';
-import type { NpsSegment, SurveyResponse } from '@/lib/types';
+import type { SurveyResponse } from '@/lib/types';
 import { CollapsibleSection } from './CollapsibleSection';
 
 interface ResponsesExplorerProps {
@@ -17,8 +17,6 @@ interface ResponsesExplorerProps {
 }
 
 type SortKey = 'recent' | 'score_asc' | 'score_desc';
-
-const SEGMENT_ORDER: NpsSegment[] = ['promoter', 'passive', 'detractor'];
 
 export function ResponsesExplorer({
   responses,
@@ -33,20 +31,6 @@ export function ResponsesExplorer({
     return b.completedTimestamp - a.completedTimestamp || b.id - a.id;
   });
 
-  const summaryPills = SEGMENT_ORDER.map((seg) => {
-    const count = responses.filter((r) => r.segment === seg).length;
-    if (count === 0) return null;
-    const config = SEGMENT_CONFIG[seg];
-    return (
-      <span
-        key={seg}
-        className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold tabular-nums ${config.badgeClass}`}
-      >
-        {count} {config.shortLabel}
-      </span>
-    );
-  });
-
   return (
     <CollapsibleSection
       id="responses-explorer-panel"
@@ -54,7 +38,6 @@ export function ResponsesExplorer({
       icon={<ListFilter className="h-5 w-5 shrink-0 text-[#0056B4]" aria-hidden="true" />}
       title={`Explorador de Respuestas (${responses.length})`}
       subtitle="Detalle completo de puntaje, perfil de contacto y comentarios abiertos."
-      summaryPills={summaryPills}
       itemCount={responses.length}
     >
       <div className="no-print mb-4 flex items-center justify-end gap-2 border-b border-slate-100 pb-3">
