@@ -15,6 +15,7 @@ import { FileUploadModal } from './FileUploadModal';
 import { FilterBar } from './FilterBar';
 import { KpiGrid } from './KpiGrid';
 import { PriorityAttentionSection } from './PriorityAttentionSection';
+import { RecommendationsSection } from './RecommendationsSection';
 import { ResponsesExplorer } from './ResponsesExplorer';
 
 interface SurveyDashboardProps {
@@ -159,6 +160,14 @@ export function SurveyDashboard({ initialDataset }: SurveyDashboardProps) {
             updateFilters({ improvementTheme })
           }
           onSelectStrengthTheme={(strengthTheme) => updateFilters({ strengthTheme })}
+        />
+
+        <RecommendationsSection
+          sourceName={dataset.sourceName}
+          responses={filteredResponses}
+          metrics={metrics}
+          presentationMode={presentationMode}
+          anonMap={anonMap}
         />
 
         <PriorityAttentionSection

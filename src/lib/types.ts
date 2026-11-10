@@ -125,3 +125,20 @@ export interface SurveyDataset {
   responses: SurveyResponse[];
   warnings: string[];
 }
+
+export type IsoPriority = 'critica' | 'alta' | 'media' | 'mantener';
+
+export type MetaPromptFocus = 'ejecutivo' | 'revision_direccion' | 'acciones_correctivas';
+
+export interface IsoRecommendation {
+  id: string;
+  priority: IsoPriority;
+  isoClause: string;
+  isoPrinciple: string;
+  title: string;
+  evidence: string;
+  recommendedAction: string;
+  verificationKpi: string;
+  affectedCount: number;
+  relatedThemeId?: ImprovementThemeId | StrengthThemeId;
+}
