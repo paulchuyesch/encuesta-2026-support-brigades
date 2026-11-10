@@ -163,7 +163,6 @@ export function SurveyDashboard({ initialDataset }: SurveyDashboardProps) {
         />
 
         <RecommendationsSection
-          sourceName={dataset.sourceName}
           responses={filteredResponses}
           metrics={metrics}
           presentationMode={presentationMode}
