@@ -1,18 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import {
-  Check,
-  ClipboardCheck,
-  Copy,
-  FileText,
-  RotateCcw,
-  ShieldCheck,
-} from 'lucide-react';
-import {
-  buildEditableRecommendationsDraft,
-  generateIsoRecommendations,
-} from '@/lib/iso-recommendations';
+import { useMemo } from 'react';
+import { ClipboardCheck, ShieldCheck } from 'lucide-react';
+import { generateIsoRecommendations } from '@/lib/iso-recommendations';
 import type { DashboardMetrics, IsoPriority, SurveyResponse } from '@/lib/types';
 
 interface RecommendationsSectionProps {
@@ -54,9 +44,6 @@ export function RecommendationsSection({
   presentationMode,
   anonMap,
 }: RecommendationsSectionProps) {
-  const [customDraft, setCustomDraft] = useState<string | null>(null);
-  const [copiedDraft, setCopiedDraft] = useState(false);
-
   const recommendations = useMemo(
     () =>
       generateIsoRecommendations(
@@ -67,23 +54,6 @@ export function RecommendationsSection({
       ),
     [responses, metrics, presentationMode, anonMap],
   );
-
-  const autoDraft = useMemo(
-    () => buildEditableRecommendationsDraft(recommendations, metrics),
-    [recommendations, metrics],
-  );
-
-  const effectiveDraft = customDraft ?? autoDraft;
-
-  async function copyDraftToClipboard() {
-    try {
-      await navigator.clipboard.writeText(effectiveDraft);
-      setCopiedDraft(true);
-      setTimeout(() => setCopiedDraft(false), 2200);
-    } catch {
-      // Clipboard API unavailable in restricted contexts
-    }
-  }
 
   return (
     <section
@@ -113,7 +83,7 @@ export function RecommendationsSection({
         </div>
       </div>
 
-      <div className="mt-5 space-y-6">
+      <div className="mt-5">
         {recommendations.length === 0 ? (
           <p className="rounded-xl bg-slate-50 p-4 text-xs font-medium text-slate-600">
             No hay respuestas en el filtro actual para generar recomendaciones ISO 9001:2015.
@@ -165,60 +135,6 @@ export function RecommendationsSection({
             })}
           </div>
         )}
-
-        {/* Editable Field for Final Management Recommendations & Agreements */}
-        <div className="print-break-avoid rounded-xl border border-slate-200 bg-slate-50/80 p-4">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-[#0056B4]" aria-hidden="true" />
-              <label
-                htmlFor="recommendations-notes"
-                className="text-xs font-extrabold uppercase tracking-wider text-[#0A2540]"
-              >
-                Campo de Recomendaciones y Acuerdos de Dirección
-              </label>
-            </div>
-
-            <div className="no-print flex flex-wrap items-center gap-2">
-              {customDraft !== null && (
-                <button
-                  type="button"
-                  onClick={() => setCustomDraft(null)}
-                  className="inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span>Regenerar desde datos</span>
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => void copyDraftToClipboard()}
-                className="inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                {copiedDraft ? (
-                  <Check className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5 text-slate-600" aria-hidden="true" />
-                )}
-                <span>{copiedDraft ? 'Copiado' : 'Copiar texto'}</span>
-              </button>
-            </div>
-          </div>
-
-          <p className="mt-1 text-[11px] text-slate-600">
-            Edita o personaliza responsables, fechas límite y acuerdos antes de imprimir el PDF o
-            copiar el informe para gerencia.
-          </p>
-
-          <textarea
-            id="recommendations-notes"
-            rows={9}
-            value={effectiveDraft}
-            onChange={(e) => setCustomDraft(e.target.value)}
-            className="mt-3 w-full rounded-xl border border-slate-300 bg-white p-3.5 font-sans text-xs leading-relaxed text-slate-800 focus:border-[#0056B4] focus:outline-none focus:ring-2 focus:ring-[#0056B4]/20"
-          />
-        </div>
       </div>
     </section>
   );
