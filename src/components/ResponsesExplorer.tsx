@@ -7,7 +7,8 @@ import {
   SEGMENT_CONFIG,
   STRENGTH_THEME_MAP,
 } from '@/lib/ui-helpers';
-import type { SurveyResponse } from '@/lib/types';
+import type { NpsSegment, SurveyResponse } from '@/lib/types';
+import { CollapsibleSection } from './CollapsibleSection';
 
 interface ResponsesExplorerProps {
   responses: SurveyResponse[];
@@ -16,6 +17,8 @@ interface ResponsesExplorerProps {
 }
 
 type SortKey = 'recent' | 'score_asc' | 'score_desc';
+
+const SEGMENT_ORDER: NpsSegment[] = ['promoter', 'passive', 'detractor'];
 
 export function ResponsesExplorer({
   responses,
@@ -30,40 +33,45 @@ export function ResponsesExplorer({
     return b.completedTimestamp - a.completedTimestamp || b.id - a.id;
   });
 
-  return (
-    <section
-      aria-label="Explorador completo de respuestas"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
-    >
-      <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <ListFilter className="h-4 w-4 text-[#0056B4]" aria-hidden="true" />
-            <h2 className="text-base font-extrabold text-[#0A2540]">
-              Explorador de Respuestas ({responses.length})
-            </h2>
-          </div>
-          <p className="mt-0.5 text-xs text-slate-600">
-            Detalle completo de puntaje, perfil de contacto y comentarios abiertos.
-          </p>
-        </div>
+  const summaryPills = SEGMENT_ORDER.map((seg) => {
+    const count = responses.filter((r) => r.segment === seg).length;
+    if (count === 0) return null;
+    const config = SEGMENT_CONFIG[seg];
+    return (
+      <span
+        key={seg}
+        className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold tabular-nums ${config.badgeClass}`}
+      >
+        {count} {config.shortLabel}
+      </span>
+    );
+  });
 
-        <div className="no-print flex items-center gap-2">
-          <ArrowUpDown className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-          <label htmlFor="sort-select" className="text-xs font-semibold text-slate-600">
-            Ordenar:
-          </label>
-          <select
-            id="sort-select"
-            value={sortKey}
-            onChange={(e) => setSortKey(e.target.value as SortKey)}
-            className="min-h-9 cursor-pointer rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 focus:border-[#0056B4] focus:outline-none focus:ring-2 focus:ring-[#0056B4]/20"
-          >
-            <option value="recent">Más recientes primero</option>
-            <option value="score_asc">Menor puntaje primero</option>
-            <option value="score_desc">Mayor puntaje primero</option>
-          </select>
-        </div>
+  return (
+    <CollapsibleSection
+      id="responses-explorer-panel"
+      ariaLabel="Explorador completo de respuestas"
+      icon={<ListFilter className="h-5 w-5 shrink-0 text-[#0056B4]" aria-hidden="true" />}
+      title={`Explorador de Respuestas (${responses.length})`}
+      subtitle="Detalle completo de puntaje, perfil de contacto y comentarios abiertos."
+      summaryPills={summaryPills}
+      itemCount={responses.length}
+    >
+      <div className="no-print mb-4 flex items-center justify-end gap-2 border-b border-slate-100 pb-3">
+        <ArrowUpDown className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
+        <label htmlFor="sort-select" className="text-xs font-semibold text-slate-600">
+          Ordenar:
+        </label>
+        <select
+          id="sort-select"
+          value={sortKey}
+          onChange={(e) => setSortKey(e.target.value as SortKey)}
+          className="min-h-9 cursor-pointer rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 focus:border-[#0056B4] focus:outline-none focus:ring-2 focus:ring-[#0056B4]/20"
+        >
+          <option value="recent">Más recientes primero</option>
+          <option value="score_asc">Menor puntaje primero</option>
+          <option value="score_desc">Mayor puntaje primero</option>
+        </select>
       </div>
 
       {sortedResponses.length === 0 ? (
@@ -76,7 +84,7 @@ export function ResponsesExplorer({
           </p>
         </div>
       ) : (
-        <div className="mt-4 divide-y divide-slate-100">
+        <div className="divide-y divide-slate-100">
           {sortedResponses.map((item) => {
             const anon = anonMap.get(item.id);
             const company = presentationMode ? (anon?.displayCompany ?? 'Empresa') : item.company;
@@ -88,7 +96,7 @@ export function ResponsesExplorer({
             return (
               <article
                 key={item.id}
-                className="print-break-avoid grid grid-cols-1 gap-4 py-4 lg:grid-cols-12"
+                className="print-break-avoid grid grid-cols-1 gap-4 py-4 first:pt-0 lg:grid-cols-12"
               >
                 {/* Left Meta Column */}
                 <div className="flex items-start gap-3 lg:col-span-4">
@@ -101,7 +109,7 @@ export function ResponsesExplorer({
                     <div className="flex flex-wrap items-center gap-1.5">
                       <h3 className="text-sm font-bold text-[#0A2540]">{company}</h3>
                       {item.isInternal && (
-                        <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-700 border border-slate-200">
+                        <span className="rounded-md border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-700">
                           Interno
                         </span>
                       )}
@@ -184,6 +192,6 @@ export function ResponsesExplorer({
           })}
         </div>
       )}
-    </section>
+    </CollapsibleSection>
   );
 }
