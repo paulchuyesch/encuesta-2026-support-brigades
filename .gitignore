@@ -1,0 +1,29 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+/dist
+
+# Testing
+/coverage
+
+# Misc
+.DS_Store
+*.pem
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+
+# Local env files
+.env*
+
+# Local agent skills, internal toolkits & raw brand manual PDFs
+/HABILIDADES/
