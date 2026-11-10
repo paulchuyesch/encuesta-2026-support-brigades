@@ -5,7 +5,6 @@ import {
   EyeOff,
   Filter,
   Info,
-  Search,
   ShieldAlert,
   X,
 } from 'lucide-react';
@@ -47,8 +46,7 @@ export function FilterBar({
     filters.segment !== 'all' ||
     filters.selectedScore !== null ||
     filters.improvementTheme !== 'all' ||
-    filters.strengthTheme !== 'all' ||
-    filters.searchQuery.trim() !== '';
+    filters.strengthTheme !== 'all';
 
   return (
     <section aria-label="Filtros y contexto de datos" className="space-y-3">
@@ -99,47 +97,17 @@ export function FilterBar({
             ))}
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="relative min-w-[230px] flex-1 sm:w-64">
-              <label htmlFor="survey-search" className="sr-only">
-                Buscar por empresa, cargo o comentario
-              </label>
-              <Search
-                className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
-                aria-hidden="true"
-              />
+          {internalCount > 0 && (
+            <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 self-start rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 select-none hover:bg-slate-100 lg:self-center">
               <input
-                id="survey-search"
-                type="search"
-                value={filters.searchQuery}
-                onChange={(e) => onUpdateFilters({ searchQuery: e.target.value })}
-                placeholder="Buscar empresa, cargo o palabra..."
-                className="min-h-10 w-full rounded-lg border border-slate-300 bg-white pr-8 pl-9 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:border-[#0056B4] focus:outline-none focus:ring-2 focus:ring-[#0056B4]/20"
+                type="checkbox"
+                checked={filters.excludeInternal}
+                onChange={(e) => onUpdateFilters({ excludeInternal: e.target.checked })}
+                className="h-4 w-4 rounded border-slate-300 accent-[#0056B4]"
               />
-              {filters.searchQuery && (
-                <button
-                  type="button"
-                  aria-label="Limpiar búsqueda"
-                  onClick={() => onUpdateFilters({ searchQuery: '' })}
-                  className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded p-1 text-slate-400 hover:text-slate-700"
-                >
-                  <X className="h-3.5 w-3.5" aria-hidden="true" />
-                </button>
-              )}
-            </div>
-
-            {internalCount > 0 && (
-              <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 select-none hover:bg-slate-100">
-                <input
-                  type="checkbox"
-                  checked={filters.excludeInternal}
-                  onChange={(e) => onUpdateFilters({ excludeInternal: e.target.checked })}
-                  className="h-4 w-4 rounded border-slate-300 accent-[#0056B4]"
-                />
-                <span>Excluir registro interno ({internalCount})</span>
-              </label>
-            )}
-          </div>
+              <span>Excluir registro interno ({internalCount})</span>
+            </label>
+          )}
         </div>
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
