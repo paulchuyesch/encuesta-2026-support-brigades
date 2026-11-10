@@ -191,7 +191,16 @@ export function generateIsoRecommendations(
     });
   }
 
-  return recommendations;
+  const priorityRank: Record<IsoRecommendation['priority'], number> = {
+    critica: 0,
+    alta: 1,
+    media: 2,
+    mantener: 3,
+  };
+
+  return recommendations.sort(
+    (a, b) => priorityRank[a.priority] - priorityRank[b.priority],
+  );
 }
 
 /** Formats generated ISO 9001:2015 recommendations into an editable executive draft. */

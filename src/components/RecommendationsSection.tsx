@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { ClipboardCheck, ShieldCheck } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ChevronDown, ClipboardCheck, ShieldCheck } from 'lucide-react';
 import { generateIsoRecommendations } from '@/lib/iso-recommendations';
 import type { DashboardMetrics, IsoPriority, SurveyResponse } from '@/lib/types';
 
@@ -14,29 +14,35 @@ interface RecommendationsSectionProps {
 
 const PRIORITY_STYLES: Record<
   IsoPriority,
-  { label: string; badgeClass: string; borderClass: string }
+  { label: string; shortPlural: string; badgeClass: string; borderClass: string }
 > = {
   critica: {
     label: 'Prioridad Crítica',
+    shortPlural: 'Crítica',
     badgeClass: 'bg-amber-100 text-amber-950 border border-amber-300',
     borderClass: 'border-l-amber-600',
   },
   alta: {
     label: 'Prioridad Alta',
+    shortPlural: 'Alta',
     badgeClass: 'bg-[#EBF4FF] text-[#003B7E] border border-[#BFD9FA]',
     borderClass: 'border-l-[#0056B4]',
   },
   media: {
     label: 'Prioridad Media',
+    shortPlural: 'Media',
     badgeClass: 'bg-sky-50 text-sky-900 border border-sky-200',
     borderClass: 'border-l-sky-600',
   },
   mantener: {
     label: 'Capitalizar (10.3)',
+    shortPlural: 'Capitalizar',
     badgeClass: 'bg-emerald-50 text-emerald-900 border border-emerald-200',
     borderClass: 'border-l-emerald-600',
   },
 };
+
+const PRIORITY_ORDER: IsoPriority[] = ['critica', 'alta', 'media', 'mantener'];
 
 export function RecommendationsSection({
   responses,
@@ -44,6 +50,8 @@ export function RecommendationsSection({
   presentationMode,
   anonMap,
 }: RecommendationsSectionProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const recommendations = useMemo(
     () =>
       generateIsoRecommendations(
@@ -55,15 +63,34 @@ export function RecommendationsSection({
     [responses, metrics, presentationMode, anonMap],
   );
 
+  const priorityCounts = useMemo(() => {
+    const counts: Record<IsoPriority, number> = {
+      critica: 0,
+      alta: 0,
+      media: 0,
+      mantener: 0,
+    };
+    for (const rec of recommendations) {
+      counts[rec.priority] += 1;
+    }
+    return counts;
+  }, [recommendations]);
+
   return (
     <section
       aria-label="Recomendaciones basadas en ISO 9001:2015"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
+      className="rounded-2xl border border-slate-200 bg-white shadow-xs"
     >
-      <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <button
+        type="button"
+        onClick={() => setIsExpanded((prev) => !prev)}
+        aria-expanded={isExpanded}
+        aria-controls="iso-recommendations-panel"
+        className="flex w-full cursor-pointer flex-col gap-3 rounded-2xl p-5 text-left transition-colors hover:bg-slate-50/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B4] lg:flex-row lg:items-center lg:justify-between"
+      >
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-[#0056B4]" aria-hidden="true" />
+            <ShieldCheck className="h-5 w-5 shrink-0 text-[#0056B4]" aria-hidden="true" />
             <h2 className="text-base font-extrabold text-[#0A2540]">
               Recomendaciones y Mejora Continua (ISO 9001:2015)
             </h2>
@@ -77,13 +104,42 @@ export function RecommendationsSection({
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 self-start rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-bold text-[#0056B4] sm:self-center">
-          <ClipboardCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
-          <span>{recommendations.length} recomendaciones</span>
-        </div>
-      </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {PRIORITY_ORDER.map((priority) => {
+              const count = priorityCounts[priority];
+              if (count === 0) return null;
+              const style = PRIORITY_STYLES[priority];
+              return (
+                <span
+                  key={priority}
+                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold tabular-nums ${style.badgeClass}`}
+                >
+                  {count} {style.shortPlural}
+                </span>
+              );
+            })}
+          </div>
 
-      <div className="mt-5">
+          <span className="no-print inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-[#0056B4] tabular-nums">
+            <ClipboardCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>
+              {isExpanded ? 'Ocultar' : `Desplegar (${recommendations.length})`}
+            </span>
+            <ChevronDown
+              className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
+                isExpanded ? 'rotate-180' : ''
+              }`}
+              aria-hidden="true"
+            />
+          </span>
+        </div>
+      </button>
+
+      <div
+        id="iso-recommendations-panel"
+        className={`${isExpanded ? 'block' : 'hidden print:block'} border-t border-slate-100 p-5`}
+      >
         {recommendations.length === 0 ? (
           <p className="rounded-xl bg-slate-50 p-4 text-xs font-medium text-slate-600">
             No hay respuestas en el filtro actual para generar recomendaciones ISO 9001:2015.
